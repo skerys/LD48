@@ -4,17 +4,27 @@ using UnityEngine;
 
 public class AsteroidSpawner : MonoBehaviour
 {
-    public BoxCollider2D insideScreenCollider;
-    public GameObject asteroidPrefab;
-
-    Vector2 randomPointInsideScreen()
+    public Asteroid asteroid;
+    public Transform radarLander;
+    public float spawnDistance;
+    public float asteroidSpeed;
+    
+    [ContextMenu("SpawnRandomAsteroid")]
+    public void SpawnAsteroid()
     {
-        Bounds bounds = insideScreenCollider.bounds;
+        float randomAngle = Random.Range(0, 2 * Mathf.PI);
+        Vector3 randomPos = new Vector3(Mathf.Sin(randomAngle), Mathf.Cos(randomAngle));
 
-        float randomX = Random.Range(bounds.min.x, bounds.max.x);
-        float randomY = Random.Range(bounds.min.y, bounds.max.y);
+        Vector3 dir = -randomPos.normalized;
 
-        return new Vector2(randomX, randomY);
+        var spawnedAsteroid = Instantiate(asteroid, radarLander.position + randomPos * spawnDistance, Quaternion.identity);
+        spawnedAsteroid.GetComponent<Rigidbody2D>().velocity = dir * asteroidSpeed;
+
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireSphere(radarLander.position, spawnDistance);
     }
 
 
