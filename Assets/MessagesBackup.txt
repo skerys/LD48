@@ -1,0 +1,18 @@
+Deep Jupiter
+
+a game made for Ld 48
+
+
+< Press to
+  begin
+  mission
+
+
+<- object
+  | detected
+  | in path
+  |
+  \  engaging
+     weapon
+     systems
+     advised

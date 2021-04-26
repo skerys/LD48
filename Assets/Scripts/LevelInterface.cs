@@ -5,6 +5,7 @@ using UnityEngine;
 public class LevelInterface : MonoBehaviour
 {
     public Transform levelIndicator;
+    public float maxIndicator;
     public ShipAngle shipAngle;
 
     Vector3 initialPosition;
@@ -16,6 +17,7 @@ public class LevelInterface : MonoBehaviour
 
     void Update()
     {
-        levelIndicator.position = new Vector3(initialPosition.x + shipAngle.shipAngle, initialPosition.y);
+        float clampledShipAngle = Mathf.Clamp(shipAngle.shipAngle, -maxIndicator, maxIndicator);
+        levelIndicator.position = new Vector3(initialPosition.x + clampledShipAngle, initialPosition.y);
     }
 }

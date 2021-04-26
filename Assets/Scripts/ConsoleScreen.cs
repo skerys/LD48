@@ -10,23 +10,28 @@ public class ConsoleScreen : MonoBehaviour
 
     public TMP_Text textElement;
     public float timeBetweenLetters;
+    public GameObject infoInConsole;
 
     string messageBacklog;
     float fadeOutTimer = -200f;
 
-    [ContextMenu("Test Console")]
-    public void MessageTest()
-    {
-        StartMessage("Engaging\n Jupiter\n atmosphere@.@.@.\n\n\nYour mom's a hoe");
-    }
+    public bool isWriting = false;
+
+    Coroutine currentCoroutine;
+
 
     public void StartMessage(string message)
     {
+        if(!textElement.gameObject.activeInHierarchy) infoInConsole.SetActive(true);
+        
+        Clear();
         textElement.gameObject.SetActive(true);
 
         messageBacklog = message;
 
-        StartCoroutine(TypeWrite());
+        if(currentCoroutine != null) StopCoroutine(currentCoroutine);
+        currentCoroutine = StartCoroutine(TypeWrite());
+        isWriting = true;
     }
 
     IEnumerator TypeWrite()
@@ -44,6 +49,12 @@ public class ConsoleScreen : MonoBehaviour
             }
                 
         }
+        isWriting = false;
+    }
+
+    public void Clear()
+    {
+        textElement.text = "";
     }
 
     void Update()

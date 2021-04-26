@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3601830380946327831}
   - component: {fileID: 2327551797782628177}
   - component: {fileID: -6677119699994347982}
-  m_Layer: 7
+  m_Layer: 8
   m_Name: Asteroid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,6 +120,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   asteroidParticle: {fileID: 3475401892967555574, guid: 712b7dfd7c2ebe949a6cce5868538eeb, type: 3}
   crossParticle: {fileID: 3475401892967555574, guid: f45cf72b929c2284eb345b41ecd66a3b, type: 3}
+  shipHealth: {fileID: 0}
+  screenShake: {fileID: 0}
+  deathSound: {fileID: 0}
 --- !u!58 &-6677119699994347982
 CircleCollider2D:
   m_ObjectHideFlags: 0

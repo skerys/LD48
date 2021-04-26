@@ -3,7 +3,8 @@ Shader "Custom/SpriteMaskInteraction"
     Properties
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
-        _Noise ("Noise Texture", 2D) = "white" {}
+        _Noise ("Noise Texture", 3D) = "white" {}
+        _NoiseTiling ("Noise Tiling", Vector) = (1,1,1,1)
         _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
         [HideInInspector] _RendererColor ("RendererColor", Color) = (1,1,1,1)
@@ -45,11 +46,14 @@ Shader "Custom/SpriteMaskInteraction"
             #pragma multi_compile _ ETC1_EXTERNAL_ALPHA
             #include "UnitySprites.cginc"
 
-            sampler2D _Noise;
+            sampler3D _Noise;
+            float4 _NoiseTiling;
 
             fixed4 SampleSprite (float2 uv)
             {
-                fixed4 color = tex2D (_MainTex, uv) * tex2D(_Noise, float2(uv.x * 5.0, uv.y));
+                fixed4 color = tex2D (_MainTex, uv) * tex3D(_Noise, float3(uv.x * _NoiseTiling.x, uv.y * _NoiseTiling.y, _Time.x * 5.0));
+
+               
 
             #if ETC1_EXTERNAL_ALPHA
                 fixed4 alpha = tex2D (_AlphaTex, uv);
