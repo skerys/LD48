@@ -14,12 +14,12 @@ public class DroneMinigame : MonoBehaviour
     public GameObject holeB;
     public GameObject consoleText;
     public GameObject droneGO;
-    public Animator extendableButton;
+    public ExtendableButton extendableButton;
 
     public Transform oxygenFillBar;
     public float oxygenDecreaseRate;
 
-    float oxygenAmount = 1f;
+    public float oxygenAmount = 1f;
 
     float initDroneX;
     float initDroneY;
@@ -104,7 +104,7 @@ public class DroneMinigame : MonoBehaviour
         gameInProgress = true;
         consoleText.SetActive(false);
         droneGO.SetActive(true);
-        extendableButton.SetTrigger("ExtendFix");
+        extendableButton.ExtendFixButton();
     }
 
     public void EndDroneGame()
@@ -112,7 +112,7 @@ public class DroneMinigame : MonoBehaviour
         gameInProgress = false;
         consoleText.SetActive(true);
         droneGO.SetActive(false);
-        extendableButton.SetTrigger("RetractFix");
+        extendableButton.RetractFixButton();
     }
 
     public bool CheckIfCanEnd()

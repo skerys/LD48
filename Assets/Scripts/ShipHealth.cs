@@ -20,12 +20,13 @@ public class ShipHealth : MonoBehaviour
     [ContextMenu("Reduce health by 1")]
     public void ReduceHealth()
     {
-        StartCoroutine(BlinkCoroutine(health - 1));
-        health--;
-
+        if(health > 0) {
+            health--;
+            StartCoroutine(BlinkCoroutine(health));
+        }
+                       
         if(health == 2) window.sprite = damagedWindow;
         if(health == 0) window.sprite = destroyedWindow;
-        
     }
 
     IEnumerator BlinkCoroutine(int id)

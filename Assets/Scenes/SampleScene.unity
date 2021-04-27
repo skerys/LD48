@@ -6708,7 +6708,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: +--*)/+*-+)!)*/why.,'..//;did..,,they.,!SEND..-/.*-.!-another?.,/
+  m_text: last bunch of rocks before core!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e4e1dc78d62b9344e8ea9c459d4ac23d, type: 2}
   m_sharedMaterial: {fileID: -2037019012306471356, guid: e4e1dc78d62b9344e8ea9c459d4ac23d, type: 2}
@@ -7631,7 +7631,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: c01f2739fe4bfcd488118aa254cf7d36, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.25
+  m_Volume: 0.1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -9570,9 +9570,10 @@ MonoBehaviour:
   holeB: {fileID: 974063688}
   consoleText: {fileID: 633684409}
   droneGO: {fileID: 1226095999}
-  extendableButton: {fileID: 1622368708}
+  extendableButton: {fileID: 1622368709}
   oxygenFillBar: {fileID: 617643575}
-  oxygenDecreaseRate: 0.02
+  oxygenDecreaseRate: 0.05
+  oxygenAmount: 1
   gameInProgress: 0
 --- !u!212 &1248292376
 SpriteRenderer:
@@ -14991,7 +14992,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 0.15
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -15766,7 +15767,7 @@ MonoBehaviour:
   noiseStrength: 0.2
   maxShipAngle: 0.9
   shipAngleToHealthDrop: 0.8
-  timeUntilHealthDrop: 2
+  timeUntilHealthDrop: 3
   stopTilt: 0
   outsideCamera: {fileID: 635429766}
   health: {fileID: 1337178195}
@@ -15817,7 +15818,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa354b1f614ea0146a25a218e639af82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  progressPercentagePerSecond: 1
+  progressPercentagePerSecond: 0.4
   exteriorBackground: {fileID: 1455512899}
   amountToScrollBG: 78
   progressIndicator: {fileID: 399167871}

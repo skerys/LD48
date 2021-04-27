@@ -12,21 +12,21 @@ public class ExtendableButton : MonoBehaviour
 
     public void ExtendShootButton()
     {
-        animator.SetTrigger("ExtendShoot");
+        animator.SetBool("Shoot", true);
     }
 
     public void RetractShootButton()
     {
-        animator.SetTrigger("RetractShoot");
+        animator.SetBool("Shoot", false);
     }
 
     public void ExtendFixButton()
     {
-        animator.SetTrigger("ExtendFix");
+        animator.SetBool("Fix", true);
     }
 
     public void RetractFixButton()
     {
-        animator.SetTrigger("RetractFix");
+        animator.SetBool("Fix", false);
     }
 }

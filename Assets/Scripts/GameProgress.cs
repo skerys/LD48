@@ -8,6 +8,7 @@ public struct ProgressEvent
 {
     public Func<bool> method;
     public float progressNeeded;
+    public bool priority;
 }
 
 public class GameProgress : MonoBehaviour
@@ -50,7 +51,7 @@ public class GameProgress : MonoBehaviour
     public GameObject droneGuide;
 
     bool gameOver = false;
-
+    bool canGoToNextEvent = false;
     void Start()
     {
         backgroundHeight = exteriorBackground.sprite.bounds.extents.y * 2f;
@@ -60,14 +61,40 @@ public class GameProgress : MonoBehaviour
         progressEvents = new List<ProgressEvent>();
 
         progressEvents.Add(new ProgressEvent{method = EventStart, progressNeeded = 0});
-        // progressEvents.Add(new ProgressEvent{method = EventBalanceIntro, progressNeeded = 0});
-        // progressEvents.Add(new ProgressEvent{method = EventAsteroidIntro, progressNeeded = 0});
-        // progressEvents.Add(new ProgressEvent{method = EventDroneIntro1, progressNeeded = 0});
-        // progressEvents.Add(new ProgressEvent{method = EventDroneIntro2, progressNeeded = 0});
-        // progressEvents.Add(new ProgressEvent{method = EventDroneIntro3, progressNeeded = 0});
-        progressEvents.Add(new ProgressEvent{method = EventEnding1, progressNeeded = 0.99f});
-        progressEvents.Add(new ProgressEvent{method = EventEnding2, progressNeeded = 0.99f});
-        progressEvents.Add(new ProgressEvent{method = EventEnding3, progressNeeded = 0.99f});
+
+        progressEvents.Add(new ProgressEvent{method = EventBalanceIntro, progressNeeded = 0.0f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventQuiz1, progressNeeded = 0, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventQuiz2, progressNeeded = 0, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventQuiz3, progressNeeded = 0, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventQuiz4, progressNeeded = 0, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventAsteroidIntro, progressNeeded = 0.15f, priority = true});
+
+        progressEvents.Add(new ProgressEvent{method = EventStrongWinds, progressNeeded = 0.22f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventStrongWindsEnd, progressNeeded = 0.3f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventAsteroidsExtra, progressNeeded = 0.35f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro1, progressNeeded = 0.4f, priority = true});
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro2, progressNeeded = 0.4f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro3, progressNeeded = 0.4f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventJokes1, progressNeeded = 0.5f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventJokes2, progressNeeded = 0.5f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventJokes3, progressNeeded = 0.5f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventJokes4, progressNeeded = 0.5f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventJokes5, progressNeeded = 0.5f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro1, progressNeeded = 0.66f, priority = true});
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro2, progressNeeded = 0.66f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventDroneIntro3NoTutorial, progressNeeded = 0.66f, priority = false});
+
+        progressEvents.Add(new ProgressEvent{method = EventAsteroidsExtra2, progressNeeded = 0.82f, priority = true});
+
+        progressEvents.Add(new ProgressEvent{method = EventEnding1, progressNeeded = 0.99f, priority = true});
+        progressEvents.Add(new ProgressEvent{method = EventEnding2, progressNeeded = 0.99f, priority = false});
+        progressEvents.Add(new ProgressEvent{method = EventEnding3, progressNeeded = 0.99f, priority = false});
 
         currentEventIndex = 0;
     }
@@ -91,23 +118,25 @@ public class GameProgress : MonoBehaviour
         bool blocked = false;
         if(!gameOver)
         {
-            if(progressValue >= progressEvents[currentEventIndex].progressNeeded) blocked = progressEvents[currentEventIndex].method();
+            blocked = progressEvents[currentEventIndex].method();
         }
         else
         {
             blocked = EventDeath();
         }
+        canGoToNextEvent |= blocked;
         
         if(!progressPaused) progressValue += progressPercentagePerSecond / 100f * Time.deltaTime;
         if(progressValue > 1.01f) progressValue = 1.01f;
         
-        if(blocked && currentEventIndex < progressEvents.Count -1)
+        if(currentEventIndex < progressEvents.Count -1 && (canGoToNextEvent || progressEvents[currentEventIndex+1].priority) && progressValue >= progressEvents[currentEventIndex+1].progressNeeded)
         {
             firstRunOfEvent = true;
             currentEventIndex++;
+            canGoToNextEvent = false;
         }
 
-        if(!gameOver && shipHealth.GetHealth() == 0)
+        if(!gameOver && (shipHealth.GetHealth() <= 0 || droneMinigame.oxygenAmount < 0.001f))
         {
             gameOver = true;
             firstRunOfEvent = true;
@@ -198,7 +227,7 @@ public class GameProgress : MonoBehaviour
         if(firstRunOfEvent)
         {
             shipAngle.stopTilt = false;
-            consoleScreen.StartMessage("Keep the\nship level!!!\n\nuse the\nbalance\nboosters\nslider to\ndo so");
+            consoleScreen.StartMessage("Keep the\nlander\nlevel!\n\nuse the\nbalance\nboosters\nslider.");
             firstRunOfEvent = false;
             routineReference = StartCoroutine(BlinkObject(balanceGuide, 2.5f));
         }
@@ -219,7 +248,7 @@ public class GameProgress : MonoBehaviour
         if(firstRunOfEvent)
         {
             consoleScreen.Clear();
-            consoleScreen.StartMessage("Object\ndetected\nin path!\n\nusing\nweapons\nsystems\nadvised!");
+            consoleScreen.StartMessage("Objects\ndetected\nin path!\n\nusing\nweapons\nsystems\nadvised!");
             firstRunOfEvent = false;
             routineReference = StartCoroutine(BlinkObject(switchGuide, 2.5f));
         }
@@ -232,6 +261,59 @@ public class GameProgress : MonoBehaviour
 
             asteroidSpawner.SpawnAsteroid();
             asteroidSpawner.SpawnAsteroid();
+
+            return true;
+        }
+        return false;
+    }
+
+    bool asteroidsExtraOnce = true;
+
+    bool EventAsteroidsExtra()
+    {
+        if(firstRunOfEvent)
+        {
+            consoleScreen.Clear();
+            consoleScreen.StartMessage("Objects\ndetected\nin path!\n\nusing\nweapons\nsystems\nadvised!");
+            firstRunOfEvent = false;
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            if(asteroidsExtraOnce == true)
+            {
+                asteroidSpawner.SpawnAsteroid();
+                asteroidSpawner.SpawnAsteroid();
+                asteroidSpawner.SpawnAsteroid();
+                asteroidsExtraOnce = false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    bool asteroidsExtra2Once = true;
+
+    bool EventAsteroidsExtra2()
+    {
+        if(firstRunOfEvent)
+        {
+            consoleScreen.Clear();
+            consoleScreen.StartMessage("Last bunch\nof rocks\nbefore core!\n\nusing\nweapons\nsystems\nadvised!");
+            firstRunOfEvent = false;
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            if(asteroidsExtra2Once == true)
+            {
+                asteroidSpawner.SpawnAsteroid();
+                asteroidSpawner.SpawnAsteroid();
+                asteroidSpawner.SpawnAsteroid();
+                asteroidSpawner.SpawnAsteroid();
+                asteroidsExtra2Once = false;
+            }
 
             return true;
         }
@@ -287,6 +369,26 @@ public class GameProgress : MonoBehaviour
             droneMinigame.EnableHoleA();
             droneMinigame.StartDroneGame();
             StartCoroutine(BlinkObject(droneGuide, 0f));
+            
+            firstRunOfEvent = false;
+        }
+
+        if(droneMinigame.CheckIfCanEnd())
+        {
+            droneMinigame.EndDroneGame();
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventDroneIntro3NoTutorial()
+    {
+        if(firstRunOfEvent)
+        {
+            consoleScreen.Clear();
+            droneMinigame.EnableHoleB();
+            droneMinigame.StartDroneGame();
             
             firstRunOfEvent = false;
         }
@@ -403,6 +505,198 @@ public class GameProgress : MonoBehaviour
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
             }
+        }
+
+        return false;
+    }
+
+    bool EventQuiz1()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("start\nmandatory\npilot quiz?\n\n< yes\n\n< of course");
+        }
+
+        if(!consoleScreen.isWriting && (EvaluateTopButton() || EvaluateBottomButton()))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventQuiz2()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("which of\nthese better\ndescribes\nyou?\n< courageus\n  and smart\n< lucky and\n  unqualified");
+        }
+
+        if(!consoleScreen.isWriting && (EvaluateTopButton() || EvaluateBottomButton()))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventQuiz3()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("we want to\nremind you\nthat lying\non the\nmandatory\npilot quiz\nwill result\nin immediate\ntermination@@@@@@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventQuiz4()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("will this\nquest grant\nyou fame or\nrespect?\n< i believe\n  so\n< i am not\n  sure");
+        }
+
+        if(!consoleScreen.isWriting &&EvaluateTopButton())
+        {
+            consoleScreen.StartMessage("okay now\nyou're lying\nto yourself\ntoo.@@@@@\nmandatory\npilot quiz\nhas been\ncompleted.");
+            return true;
+        }
+        if(!consoleScreen.isWriting &&EvaluateBottomButton()){
+            consoleScreen.StartMessage("honesly,\nme neither\n\n\nmandatory\npilot quiz\nhas been\ncompleted.");
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventJokes1()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("after such a\nstressful\nsituation\nprotocol\nrequires me\nto provide 3\njokes for\nstress relief@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventJokes2()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("jupiter's\ngreat red\nspot is\nshrinking.@@@@@@\nthanks to\nthe\nprescribed\ntreatment.@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventJokes3()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("jupiter is a\ngas giant@@.@@.@@.\n\ndamn bean\nburritos\nman...@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+     bool EventJokes4()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("why did the\nchicken\ncross the\nroad?@@@@\nto avoid\nbeing\nobliterated\nby the rock.@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    bool joke5Once = true;
+     bool EventJokes5()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("what i'm\ntrying to\nsay is that\nthere's some\nmore\nmeteors\ncoming your\nway.@@@@@@@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            if(joke5Once)
+            {
+                for(int i = 0; i < 4; i++)
+                {
+                    asteroidSpawner.SpawnAsteroid();
+                }
+                joke5Once = false;    
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventStrongWinds()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("strong\njupiter\nwinds\ndetected.\n\nmake sure to\nkeep the\nlander\nbalanced.");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            shipAngle.noiseStrength = 1f;
+            return true;
+        }
+
+        return false;
+    }
+
+    bool EventStrongWindsEnd()
+    {
+        if(firstRunOfEvent)
+        {
+            firstRunOfEvent = false;
+            consoleScreen.StartMessage("strong\njupiter\nwinds have\npassed.\n\ngood job@@@?@");
+        }
+
+        if(!consoleScreen.isWriting)
+        {
+            shipAngle.noiseStrength = 0.2f;
+            return true;
         }
 
         return false;
